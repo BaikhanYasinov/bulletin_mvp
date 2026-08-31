@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Бюллетени — архив</title>
+<style>
+  body {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    background: #f3f4f6;
+    margin: 0;
+    padding: 32px 16px;
+    color: #1f2937;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  p.sub { color: #6b7280; font-size: 13px; margin-top: 0; margin-bottom: 24px; }
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  form.generate button {
+    background: #1e3a8a;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  form.generate button:hover { background: #1e40af; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #e5e7eb; }
+  th { color: #6b7280; font-weight: 500; font-size: 12px; }
+  a.link { color: #1e3a8a; text-decoration: none; margin-right: 14px; }
+  a.link:hover { text-decoration: underline; }
+  .empty { color: #6b7280; font-size: 14px; padding: 12px 0; }
+  .flash {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Бюллетени</h1>
+  <p class="sub">Прототип: генерация вручную кнопкой, данные — моковые.</p>
+
+  {% if flash %}
+  <div class="flash">{{ flash }}</div>
+  {% endif %}
+
+  <div class="card">
+    <form class="generate" method="post" action="/generate">
+      <button type="submit">Сформировать бюллетень сейчас</button>
+    </form>
+  </div>
+
+  <div class="card">
+    {% if items %}
+    <table>
+      <tr><th>Период</th><th>Файлы</th></tr>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.period }}</td>
+        <td>
+          <a class="link" href="/bulletin/{{ item.period }}" target="_blank">Открыть HTML</a>
+          <a class="link" href="/bulletin/{{ item.period }}/pdf">Скачать PDF</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <div class="empty">Бюллетеней пока нет — нажмите кнопку выше.</div>
+    {% endif %}
+  </div>
+</div>
+</body>
+</html>

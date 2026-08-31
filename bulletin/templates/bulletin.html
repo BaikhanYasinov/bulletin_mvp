@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>{{ title }}</title>
+<style>
+  body {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    background: #f3f4f6;
+    margin: 0;
+    padding: 24px;
+    color: #1f2937;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .header {
+    background: #1e3a8a;
+    color: #ffffff;
+    padding: 24px 28px;
+  }
+  .header h1 { margin: 0 0 6px; font-size: 20px; }
+  .header p { margin: 0; font-size: 13px; opacity: 0.85; }
+  .body { padding: 24px 28px; }
+  .alerts { margin-bottom: 20px; }
+  .alert {
+    background: #fef2f2;
+    border-left: 3px solid #dc2626;
+    color: #991b1b;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .kpi-label { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+  .kpi-value { font-size: 22px; font-weight: 600; color: #111827; }
+  .kpi-delta { font-size: 12px; margin-top: 4px; }
+  .up { color: #059669; }
+  .down { color: #dc2626; }
+  h2 { font-size: 15px; color: #111827; margin: 24px 0 12px; }
+  img.chart { width: 100%; border-radius: 8px; border: 1px solid #e5e7eb; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #e5e7eb; }
+  th { color: #6b7280; font-weight: 500; }
+  .footer { padding: 16px 28px; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>{{ title }}</h1>
+      <p>Период: {{ period_start }} – {{ period_end }} · Сформировано: {{ generated_at }}</p>
+    </div>
+    <div class="body">
+
+      {% if alerts %}
+      <div class="alerts">
+        {% for a in alerts %}
+        <div class="alert">⚠ {{ a }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Выручка</div>
+          <div class="kpi-value">{{ "{:,}".format(kpis.revenue).replace(",", " ") }} ₽</div>
+          <div class="kpi-delta {{ 'up' if kpis.revenue_delta >= 0 else 'down' }}">
+            {{ "%+.1f"|format(kpis.revenue_delta) }}% к прошлой неделе
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Заказы</div>
+          <div class="kpi-value">{{ kpis.orders }}</div>
+          <div class="kpi-delta {{ 'up' if kpis.orders_delta >= 0 else 'down' }}">
+            {{ "%+.1f"|format(kpis.orders_delta) }}% к прошлой неделе
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Конверсия</div>
+          <div class="kpi-value">{{ kpis.conversion }}%</div>
+          <div class="kpi-delta {{ 'up' if kpis.conversion_delta >= 0 else 'down' }}">
+            {{ "%+.1f"|format(kpis.conversion_delta) }}% к прошлой неделе
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Средний чек</div>
+          <div class="kpi-value">{{ "{:,}".format(kpis.avg_check).replace(",", " ") }} ₽</div>
+          <div class="kpi-delta {{ 'up' if kpis.avg_check_delta >= 0 else 'down' }}">
+            {{ "%+.1f"|format(kpis.avg_check_delta) }}% к прошлой неделе
+          </div>
+        </div>
+      </div>
+
+      <h2>Динамика выручки</h2>
+      <img class="chart" src="{{ chart_filename }}" alt="График динамики выручки">
+
+      <h2>Топ-5 товаров по выручке</h2>
+      <table>
+        <tr><th>Товар</th><th>Выручка</th><th>Рост</th></tr>
+        {% for p in top_products %}
+        <tr>
+          <td>{{ p.name }}</td>
+          <td>{{ "{:,}".format(p.revenue).replace(",", " ") }} ₽</td>
+          <td class="{{ 'up' if p.growth >= 0 else 'down' }}">{{ "%+.1f"|format(p.growth) }}%</td>
+        </tr>
+        {% endfor %}
+      </table>
+
+    </div>
+    <div class="footer">
+      Автоматический бюллетень. Сформирован системой аналитики — данные актуальны на конец отчётного периода.
+    </div>
+  </div>
+</body>
+</html>
